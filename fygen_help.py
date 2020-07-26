@@ -1,25 +1,33 @@
-# Table of Contents
+"""Generates online documentation for fygen."""
 
-  - [Introduction](#introduction)
-  - [Prerequisites](#prerequisites)
-  - [Basic Usage](#basic-usage)
-  - [Low Level Access](#low-level-access)
-  - [Available Waveforms](#available-waveforms)
-  - [Custom Waveforms](#custom-waveforms)
-  - [Modulation](#modulation)
-  - [Sweep](#sweep)
-  - [Measurement](#measurement)
-  - [Parameter Load and Save](#parameter-load-and-save)
-  - [Parameter Synchronization](#parameter-synchronization)
-  - [Uplink Mode](#uplink-mode)
-  - [Miscellaneous Functions](#miscellaneous-functions)
-  - [Read-Before-Write](#read-before-write)
-  - [Initial State](#initial-state)
-  - [Streaming Output to a File](#streaming-output-to-a-file)
-  - [Troubleshooting](#troubleshooting)
+import sys
+import six
 
-# Introduction
+import wavedef
 
+SECTIONS = (
+    'Introduction',
+    'Prerequisites',
+    'Basic Usage',
+    'Low Level Access',
+    'Available Waveforms',
+    'Custom Waveforms',
+    'Modulation',
+    'Sweep',
+    'Measurement',
+    'Parameter Load and Save',
+    'Parameter Synchronization',
+    'Uplink Mode',
+    'Miscellaneous Functions',
+    'Read-Before-Write',
+    'Initial State',
+    'Streaming Output to a File',
+    'Troubleshooting',
+)
+
+_HELP = {}
+
+_HELP['Introduction'] = """
 `fygen` is a library that allows you to control any of several Feeltech signal
 generators.  It was developed with the
 [FY2300](http://en.feeltech.net/index.php?case=archive&act=show&aid=17) which is
@@ -57,9 +65,9 @@ or liability for any damage caused, time lost, or money lost as a result of
 using this software.  You should test all features in a safe manner and assume
 responsibility for anything that might go wrong. If this is not acceptable,
 please do not use this software.
+"""
 
-# Prerequisites
-
+_HELP['Prerequisites'] = """
 You may use either Python 2 or Python 3.
 
 For either, you will need the [pyserial](https://pypi.org/project/pyserial/)
@@ -78,9 +86,9 @@ If you plan on using this library interactively, I recommend trying
 [ipython](ipython.org), which can be easily installed in Ubuntu via:
 
     sudo apt install ipython ipython3
+"""
 
-# Basic Usage
-
+_HELP['Basic Usage'] = """
 You must determine the serial port address of your connected signal generator.
 In Linux, `/dev/ttyUSB0` is commonly correct.  This is also is the default
 value.
@@ -139,9 +147,9 @@ See more docs on set
 Or online help:
 
     fygen.help()
+"""
 
-# Low Level Access
-
+_HELP['Low Level Access'] = """
 The `fygen` library offers low level access.
 
 If you issue the `send()` method, the command will be sent to the device
@@ -162,111 +170,9 @@ is also a `debug_level=2` option to hold off sending the commands until you
 press enter.
 
 See `examples/lowlevel` for some code examples.
+"""
 
-# Available Waveforms
-|Name           |Description                             |Channels|
-|---------------|----------------------------------------|--------|
-|`sin`          |Sin                                     |    0, 1|
-|`square`       |Square                                  |    0, 1|
-|`cmos`         |CMOS                                    |    0, 1|
-|`adj-pulse`    |Adjustable Pulse                        |       0|
-|`dc`           |DC                                      |    0, 1|
-|`tri`          |Triangle                                |    0, 1|
-|`ramp`         |Ramp                                    |    0, 1|
-|`neg-ramp`     |Negative Ramp                           |    0, 1|
-|`stair-tri`    |Stairstep Triangle                      |    0, 1|
-|`stair`        |Stairstep                               |    0, 1|
-|`neg-stair`    |Negative Stairstep                      |    0, 1|
-|`exp`          |Exponential                             |    0, 1|
-|`neg-exp`      |Negative Exponential                    |    0, 1|
-|`fall-exp`     |Falling Exponential                     |    0, 1|
-|`neg-fall-exp` |Negative Falling Exponential            |    0, 1|
-|`log`          |Logarithm                               |    0, 1|
-|`neg-log`      |Negative Logarithm                      |    0, 1|
-|`fall-log`     |Falling Logarithm                       |    0, 1|
-|`neg-fall-log` |Negative Falling Logarithm              |    0, 1|
-|`full-wav`     |Full Wave                               |    0, 1|
-|`neg-full-wav` |Negative Full Wave                      |    0, 1|
-|`half-wav`     |Half Wave                               |    0, 1|
-|`neg-half-wav` |Negative Half Wave                      |    0, 1|
-|`lorentz`      |Lorentz Pulse                           |    0, 1|
-|`multitone`    |Multitone                               |    0, 1|
-|`rand`         |Random                                  |    0, 1|
-|`ecg`          |ECG                                     |    0, 1|
-|`trap`         |Trapezoidal Pulse                       |    0, 1|
-|`sinc`         |Sinc Pulse                              |    0, 1|
-|`impulse`      |Impulse                                 |    0, 1|
-|`gauss`        |Gauss White Noise                       |    0, 1|
-|`am`           |AM                                      |    0, 1|
-|`fm`           |FM                                      |    0, 1|
-|`chirp`        |Chirp                                   |    0, 1|
-|`arb1`         |Arbitrary Waveform 1                    |    0, 1|
-|`arb2`         |Arbitrary Waveform 2                    |    0, 1|
-|`arb3`         |Arbitrary Waveform 3                    |    0, 1|
-|`arb4`         |Arbitrary Waveform 4                    |    0, 1|
-|`arb5`         |Arbitrary Waveform 5                    |    0, 1|
-|`arb6`         |Arbitrary Waveform 6                    |    0, 1|
-|`arb7`         |Arbitrary Waveform 7                    |    0, 1|
-|`arb8`         |Arbitrary Waveform 8                    |    0, 1|
-|`arb9`         |Arbitrary Waveform 9                    |    0, 1|
-|`arb10`        |Arbitrary Waveform 10                   |    0, 1|
-|`arb11`        |Arbitrary Waveform 11                   |    0, 1|
-|`arb12`        |Arbitrary Waveform 12                   |    0, 1|
-|`arb13`        |Arbitrary Waveform 13                   |    0, 1|
-|`arb14`        |Arbitrary Waveform 14                   |    0, 1|
-|`arb15`        |Arbitrary Waveform 15                   |    0, 1|
-|`arb16`        |Arbitrary Waveform 16                   |    0, 1|
-|`arb17`        |Arbitrary Waveform 17                   |    0, 1|
-|`arb18`        |Arbitrary Waveform 18                   |    0, 1|
-|`arb19`        |Arbitrary Waveform 19                   |    0, 1|
-|`arb20`        |Arbitrary Waveform 20                   |    0, 1|
-|`arb21`        |Arbitrary Waveform 21                   |    0, 1|
-|`arb22`        |Arbitrary Waveform 22                   |    0, 1|
-|`arb23`        |Arbitrary Waveform 23                   |    0, 1|
-|`arb24`        |Arbitrary Waveform 24                   |    0, 1|
-|`arb25`        |Arbitrary Waveform 25                   |    0, 1|
-|`arb26`        |Arbitrary Waveform 26                   |    0, 1|
-|`arb27`        |Arbitrary Waveform 27                   |    0, 1|
-|`arb28`        |Arbitrary Waveform 28                   |    0, 1|
-|`arb29`        |Arbitrary Waveform 29                   |    0, 1|
-|`arb30`        |Arbitrary Waveform 30                   |    0, 1|
-|`arb31`        |Arbitrary Waveform 31                   |    0, 1|
-|`arb32`        |Arbitrary Waveform 32                   |    0, 1|
-|`arb33`        |Arbitrary Waveform 33                   |    0, 1|
-|`arb34`        |Arbitrary Waveform 34                   |    0, 1|
-|`arb35`        |Arbitrary Waveform 35                   |    0, 1|
-|`arb36`        |Arbitrary Waveform 36                   |    0, 1|
-|`arb37`        |Arbitrary Waveform 37                   |    0, 1|
-|`arb38`        |Arbitrary Waveform 38                   |    0, 1|
-|`arb39`        |Arbitrary Waveform 39                   |    0, 1|
-|`arb40`        |Arbitrary Waveform 40                   |    0, 1|
-|`arb41`        |Arbitrary Waveform 41                   |    0, 1|
-|`arb42`        |Arbitrary Waveform 42                   |    0, 1|
-|`arb43`        |Arbitrary Waveform 43                   |    0, 1|
-|`arb44`        |Arbitrary Waveform 44                   |    0, 1|
-|`arb45`        |Arbitrary Waveform 45                   |    0, 1|
-|`arb46`        |Arbitrary Waveform 46                   |    0, 1|
-|`arb47`        |Arbitrary Waveform 47                   |    0, 1|
-|`arb48`        |Arbitrary Waveform 48                   |    0, 1|
-|`arb49`        |Arbitrary Waveform 49                   |    0, 1|
-|`arb50`        |Arbitrary Waveform 50                   |    0, 1|
-|`arb51`        |Arbitrary Waveform 51                   |    0, 1|
-|`arb52`        |Arbitrary Waveform 52                   |    0, 1|
-|`arb53`        |Arbitrary Waveform 53                   |    0, 1|
-|`arb54`        |Arbitrary Waveform 54                   |    0, 1|
-|`arb55`        |Arbitrary Waveform 55                   |    0, 1|
-|`arb56`        |Arbitrary Waveform 56                   |    0, 1|
-|`arb57`        |Arbitrary Waveform 57                   |    0, 1|
-|`arb58`        |Arbitrary Waveform 58                   |    0, 1|
-|`arb59`        |Arbitrary Waveform 59                   |    0, 1|
-|`arb60`        |Arbitrary Waveform 60                   |    0, 1|
-|`arb61`        |Arbitrary Waveform 61                   |    0, 1|
-|`arb62`        |Arbitrary Waveform 62                   |    0, 1|
-|`arb63`        |Arbitrary Waveform 63                   |    0, 1|
-|`arb64`        |Arbitrary Waveform 64                   |    0, 1|
-
-# Custom Waveforms
-
+_HELP['Custom Waveforms'] = """
 You can use the `set_waveform()` method to generate custom waveforms for your
 signal generator.  This is done by creating an array of either floating point
 values or integers.  The array size must match the number of data points
@@ -308,9 +214,9 @@ generator takes 14-bit values for input)
 
 See `examples/arb/simple_arb.py`, `examples/arb/xy_star_plot.py` and
   `examples/gcode/xy_gcode_plot.py` for more examples.
+"""
 
-# Modulation
-
+_HELP['Modulation'] = """
 fygen supports the modulation mode of the function generator.  One
 good way to learn it is to experiment with the functions, and look at
 the example scripts in `examples/modulation`.
@@ -334,9 +240,9 @@ channel will cause 3 pulses on the primary channel to be sent. Neat!
 
 Use `help(fygen.FYGen.set_modulation)` for more details on the various
 available options.
+"""
 
-# Sweep
-
+_HELP['Sweep'] = """
 fygen supports the sweep mode of the function generator. Unfortunately, on the
 test device (FY2300, V2.3) the sweep device firmware was buggy.  It's still
 somewhat usable but basic functions, like enabling the sweep programatically, do
@@ -378,9 +284,9 @@ Some additional notes:
 
 Use `help(fygen.FYGen.set_sweep)` for more details on the various
 available options.  Check the `examples/sweep` directory for example scripts.
+"""
 
-# Measurement
-
+_HELP['Measurement'] = """
 The FY2300 (and similar) signal generators have the ability to measure
 frequencies, basic waveform timings and count pulses.  Unfortunately,
 the utility of this feature is limited by the hardware's 5V maximum input
@@ -432,9 +338,9 @@ Use `help(fygen.FYGen.set_measurement)` and `help(fygen.FYGen.get_measurement)`
 for more details on the various available options.
 
 See the `examples/measurement` direectory for code examples.
+"""
 
-# Parameter Load and Save
-
+_HELP['Parameter Load and Save'] = """
 The Feeltech signal generators offer the ability to save their current state,
 including the selected wave, frequency, etc in an internal storage slot.
 
@@ -451,9 +357,9 @@ Then to load it later:
 ![Load](pics/load.jpg)
 
 Note that slot 1 is documented to be the device's power-on state.
+"""
 
-# Parameter Synchronization
-
+_HELP['Parameter Synchronization'] = """
 The feeltech signal generator offers the ability to synchronize one or more
 parameters between it's two output channels.  Although this seems of limited
 value in scripts, it may be useful for setting up the device UI for running a
@@ -486,9 +392,9 @@ Or all parameters:
 
 See `help(fygen.FYGen.get_synchronization)` and
 `help(fygen.FYGen.set_synchronization)` for more information.
+"""
 
-# Uplink Mode
-
+_HELP['Uplink Mode'] = """
 It's possible to link several Feeltech signal generators together.
 
 There are two commands, `set_uplink()` and `get_uplink()`.
@@ -508,9 +414,9 @@ You can also get a parameter:
 or all parameters:
 
     fy.get_uplink()
+"""
 
-# Miscellaneous Functions
-
+_HELP['Miscellaneous Functions'] = """
 `set_buzzer(True/False)` can be used to turn the signal buzzer on and off.
 There is also a `get_buzzer()` method.
 
@@ -518,9 +424,9 @@ There is also a `get_buzzer()` method.
 generator in use.
 
 `fygen.get_version()` will tell you the version of the `fygen` library itself.
+"""
 
-# Read-Before-Write
-
+_HELP['Read-Before-Write'] = """
 By default, when you create a `FYGen` object, the `read_before_write` property
 is set.  When this property is enabled, the signal general will be
 queried for it's current state before changing anything and queried
@@ -560,9 +466,9 @@ The following will occur:
 
 and no write.  This command sequence will also complete nearly instantly, verses
 the 250ms or so needed to issue the write.
+"""
 
-# Initial State
-
+_HELP['Initial State'] = """
 By default, when you create a `FYGen` object, the `init_state` property is
 set.  When enabled, the *first* (and only the first) call to `set()` for a
 particular channel will attempt to set all *omitted* parameters (voltage,
@@ -593,9 +499,9 @@ first one does this and only if `init_state` is left at the default value of
 `True` when initializing the `FYGen` object.
 
 This is done to make the environment more consistent and tests more repeatable,
+"""
 
-# Streaming Output to a File
-
+_HELP['Streaming Output to a File'] = """
 Instead of writing to a real signal generator, you can opt to write to a file
 object instead.  This includes `std.stdout` if you want to see commands streamed
 to the console.
@@ -611,9 +517,9 @@ to the console.
 If you want to see the command that are also sent to a real device, you
 can use the `debug_level` option to do so.  Refer to the
 [troubleshooting](#troubleshooting) section for more details.
+"""
 
-# Troubleshooting
-
+_HELP['Troubleshooting'] = """
 With the multitude of devices and firmware releases in the wild, it's likely
 that some users will need to do some troubleshooting.  fygen provides special
 modes to help investigate issues.
@@ -662,4 +568,78 @@ You can alternatively create a device that sends to stdout, take note of the
 codes, then use the `send()` to manually forward the output yourself.
 
     fy = fygen.FYGen(port=sys.stdout)
+"""
 
+class Error(Exception):
+  """Base error class."""
+
+class InvalidHelpSectionError(Error):
+  """User selected an invalid help section number."""
+
+class UnknownDeviceError(Error):
+  """An unknown device was passed."""
+
+
+# pylint: disable=redefined-builtin
+def help(
+    section,
+    device,
+    fout=sys.stdout,
+    show_other_sections=True,
+    markdown_format=False):
+  """Generates help text.
+
+  Args:
+    section: A section number.
+    device: Which device to create help for.
+    fout: Where to stream the help text.
+    show_other_sections: Whether or not to output a table of contents.
+  """
+  if isinstance(section, (list, tuple)):
+    # recursively call subsections
+    for s in section:
+      help(s, device, fout, False)
+    return
+
+  if section >= len(SECTIONS):
+    raise InvalidHelpSectionError(
+        'Invalid help section: %s, maximum value is %u' %
+        (section, len(SECTIONS) - 1))
+
+  def heading(title):
+    """Common heading generator."""
+    if markdown_format:
+      fout.write('# %s\n' % title)
+    else:
+      fout.write(title)
+      fout.write('\n')
+      fout.write('-' * 80)
+      fout.write('\n\n')
+
+  title = SECTIONS[section]
+  heading(title)
+
+  if title == 'Available Waveforms':
+    body = _available_waveforms(device, markdown_format)
+  else:
+    body = _HELP[title]
+
+  fout.write(body)
+  fout.write('\n')
+
+  if show_other_sections:
+    heading('Other Help Sections')
+    for n, title in enumerate(SECTIONS):
+      cmd = 'fygen.help(%u)' % n
+      fout.write('  %-20s %s\n' % (cmd, title))
+
+    fout.write('\n')
+# pylint: enable=redefined-builtin
+
+def _available_waveforms(device, markdown_format):
+  wf_docs = six.StringIO()
+  try:
+    wavedef.help(device, wf_docs, markdown_format)
+  except wavedef.Error as e:
+    raise UnknownDeviceError(e)
+  return wf_docs.getvalue()
