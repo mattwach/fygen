@@ -17,6 +17,7 @@
   - [Initial State](#initial-state)
   - [Streaming Output to a File](#streaming-output-to-a-file)
   - [Troubleshooting](#troubleshooting)
+  - [Development](#development)
 
 # Introduction
 
@@ -662,4 +663,40 @@ You can alternatively create a device that sends to stdout, take note of the
 codes, then use the `send()` to manually forward the output yourself.
 
     fy = fygen.FYGen(port=sys.stdout)
+
+# Development
+
+To develop in `fygen` you will need the `pylint` tools installed for Python 3.
+
+After that, you can type
+
+    make all
+
+To run the following:
+
+  - Unit tests (`fygen_test.py`)
+  - `examples/` dry runs
+  - Lint
+
+These can also be run individually.  Please read the short `Makefile` for
+details.
+
+Below is a list of files and what they are for:
+
+  - `fygen.py` is the main logic where most meaningful changes go.
+  - `fygen_test.py` is a unit test for `fygen.py` that attempts to cover
+    every possible error path along with example "good path" tests for
+    each feature.
+  - `fygen_help.py` is used to generate online help and used as a basis
+    for generating `README.md`
+  - `make_readme.py` generates `README.md` from `fygen_help.py`
+  - `wavedef.py` contains the logic to translate between waveform names
+    and id numbers.
+
+For a code patch to qualify for submission:
+
+  - The code needs to be tested in `fygen_test.py`
+  - If needed, documentation should be added to `fygen_help.py` and
+    `make_readme.py` should be run to regenerate `README.md`
+  - `make all` should pass all unit tests and report no lint errors.
 
