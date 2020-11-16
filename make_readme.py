@@ -17,7 +17,7 @@ def main():
     for section_idx in range(len(fygen_help.SECTIONS)):
       fygen_help.help(
           section=section_idx,
-          device='',
+          device=None,
           fout=fout,
           show_other_sections=False,
           markdown_format=True)

@@ -25,8 +25,9 @@
 generators.  It was developed with the
 [FY2300](http://en.feeltech.net/index.php?case=archive&act=show&aid=17) which is
 nearly identical to the
-[FY6600](http://en.feeltech.net/index.php?case=archive&act=show&aid=59) and
-[FY6800](http://en.feeltech.net/index.php?case=archive&act=show&aid=61) in
+[FY6600](http://en.feeltech.net/index.php?case=archive&act=show&aid=59),
+[FY6800](http://en.feeltech.net/index.php?case=archive&act=show&aid=61) and
+[FY6900](http://en.feeltech.net/index.php?case=archive&act=show&aid=65) in
 features.  Other generators should also work, although some tweaks may be
 required.
 
@@ -89,6 +90,12 @@ value.
     import fygen
     fy = fygen.FYGen('/dev/ttyUSB0', debug_level=1)
     fy = fygen.FYGen(debug_level=1)  # Same thing
+    
+    # In case you get UnsupportedDeviceError, you can manually specify
+    # one of the supported devices that may be compatible.
+    # The id's of waveforms are different between models,
+    # so you might not get the waveform you ask for
+    fy = fygen.FyGen(device_name='fy2300')
     
 Once connected, this command will setup a 1Mhz sin wave on the main channel:
 
@@ -165,106 +172,108 @@ press enter.
 See `examples/lowlevel` for some code examples.
 
 # Available Waveforms
-|Name           |Description                             |Channels|
-|---------------|----------------------------------------|--------|
-|`sin`          |Sin                                     |    0, 1|
-|`square`       |Square                                  |    0, 1|
-|`cmos`         |CMOS                                    |    0, 1|
-|`adj-pulse`    |Adjustable Pulse                        |       0|
-|`dc`           |DC                                      |    0, 1|
-|`tri`          |Triangle                                |    0, 1|
-|`ramp`         |Ramp                                    |    0, 1|
-|`neg-ramp`     |Negative Ramp                           |    0, 1|
-|`stair-tri`    |Stairstep Triangle                      |    0, 1|
-|`stair`        |Stairstep                               |    0, 1|
-|`neg-stair`    |Negative Stairstep                      |    0, 1|
-|`exp`          |Exponential                             |    0, 1|
-|`neg-exp`      |Negative Exponential                    |    0, 1|
-|`fall-exp`     |Falling Exponential                     |    0, 1|
-|`neg-fall-exp` |Negative Falling Exponential            |    0, 1|
-|`log`          |Logarithm                               |    0, 1|
-|`neg-log`      |Negative Logarithm                      |    0, 1|
-|`fall-log`     |Falling Logarithm                       |    0, 1|
-|`neg-fall-log` |Negative Falling Logarithm              |    0, 1|
-|`full-wav`     |Full Wave                               |    0, 1|
-|`neg-full-wav` |Negative Full Wave                      |    0, 1|
-|`half-wav`     |Half Wave                               |    0, 1|
-|`neg-half-wav` |Negative Half Wave                      |    0, 1|
-|`lorentz`      |Lorentz Pulse                           |    0, 1|
-|`multitone`    |Multitone                               |    0, 1|
-|`rand`         |Random                                  |    0, 1|
-|`ecg`          |ECG                                     |    0, 1|
-|`trap`         |Trapezoidal Pulse                       |    0, 1|
-|`sinc`         |Sinc Pulse                              |    0, 1|
-|`impulse`      |Impulse                                 |    0, 1|
-|`gauss`        |Gauss White Noise                       |    0, 1|
-|`am`           |AM                                      |    0, 1|
-|`fm`           |FM                                      |    0, 1|
-|`chirp`        |Chirp                                   |    0, 1|
-|`arb1`         |Arbitrary Waveform 1                    |    0, 1|
-|`arb2`         |Arbitrary Waveform 2                    |    0, 1|
-|`arb3`         |Arbitrary Waveform 3                    |    0, 1|
-|`arb4`         |Arbitrary Waveform 4                    |    0, 1|
-|`arb5`         |Arbitrary Waveform 5                    |    0, 1|
-|`arb6`         |Arbitrary Waveform 6                    |    0, 1|
-|`arb7`         |Arbitrary Waveform 7                    |    0, 1|
-|`arb8`         |Arbitrary Waveform 8                    |    0, 1|
-|`arb9`         |Arbitrary Waveform 9                    |    0, 1|
-|`arb10`        |Arbitrary Waveform 10                   |    0, 1|
-|`arb11`        |Arbitrary Waveform 11                   |    0, 1|
-|`arb12`        |Arbitrary Waveform 12                   |    0, 1|
-|`arb13`        |Arbitrary Waveform 13                   |    0, 1|
-|`arb14`        |Arbitrary Waveform 14                   |    0, 1|
-|`arb15`        |Arbitrary Waveform 15                   |    0, 1|
-|`arb16`        |Arbitrary Waveform 16                   |    0, 1|
-|`arb17`        |Arbitrary Waveform 17                   |    0, 1|
-|`arb18`        |Arbitrary Waveform 18                   |    0, 1|
-|`arb19`        |Arbitrary Waveform 19                   |    0, 1|
-|`arb20`        |Arbitrary Waveform 20                   |    0, 1|
-|`arb21`        |Arbitrary Waveform 21                   |    0, 1|
-|`arb22`        |Arbitrary Waveform 22                   |    0, 1|
-|`arb23`        |Arbitrary Waveform 23                   |    0, 1|
-|`arb24`        |Arbitrary Waveform 24                   |    0, 1|
-|`arb25`        |Arbitrary Waveform 25                   |    0, 1|
-|`arb26`        |Arbitrary Waveform 26                   |    0, 1|
-|`arb27`        |Arbitrary Waveform 27                   |    0, 1|
-|`arb28`        |Arbitrary Waveform 28                   |    0, 1|
-|`arb29`        |Arbitrary Waveform 29                   |    0, 1|
-|`arb30`        |Arbitrary Waveform 30                   |    0, 1|
-|`arb31`        |Arbitrary Waveform 31                   |    0, 1|
-|`arb32`        |Arbitrary Waveform 32                   |    0, 1|
-|`arb33`        |Arbitrary Waveform 33                   |    0, 1|
-|`arb34`        |Arbitrary Waveform 34                   |    0, 1|
-|`arb35`        |Arbitrary Waveform 35                   |    0, 1|
-|`arb36`        |Arbitrary Waveform 36                   |    0, 1|
-|`arb37`        |Arbitrary Waveform 37                   |    0, 1|
-|`arb38`        |Arbitrary Waveform 38                   |    0, 1|
-|`arb39`        |Arbitrary Waveform 39                   |    0, 1|
-|`arb40`        |Arbitrary Waveform 40                   |    0, 1|
-|`arb41`        |Arbitrary Waveform 41                   |    0, 1|
-|`arb42`        |Arbitrary Waveform 42                   |    0, 1|
-|`arb43`        |Arbitrary Waveform 43                   |    0, 1|
-|`arb44`        |Arbitrary Waveform 44                   |    0, 1|
-|`arb45`        |Arbitrary Waveform 45                   |    0, 1|
-|`arb46`        |Arbitrary Waveform 46                   |    0, 1|
-|`arb47`        |Arbitrary Waveform 47                   |    0, 1|
-|`arb48`        |Arbitrary Waveform 48                   |    0, 1|
-|`arb49`        |Arbitrary Waveform 49                   |    0, 1|
-|`arb50`        |Arbitrary Waveform 50                   |    0, 1|
-|`arb51`        |Arbitrary Waveform 51                   |    0, 1|
-|`arb52`        |Arbitrary Waveform 52                   |    0, 1|
-|`arb53`        |Arbitrary Waveform 53                   |    0, 1|
-|`arb54`        |Arbitrary Waveform 54                   |    0, 1|
-|`arb55`        |Arbitrary Waveform 55                   |    0, 1|
-|`arb56`        |Arbitrary Waveform 56                   |    0, 1|
-|`arb57`        |Arbitrary Waveform 57                   |    0, 1|
-|`arb58`        |Arbitrary Waveform 58                   |    0, 1|
-|`arb59`        |Arbitrary Waveform 59                   |    0, 1|
-|`arb60`        |Arbitrary Waveform 60                   |    0, 1|
-|`arb61`        |Arbitrary Waveform 61                   |    0, 1|
-|`arb62`        |Arbitrary Waveform 62                   |    0, 1|
-|`arb63`        |Arbitrary Waveform 63                   |    0, 1|
-|`arb64`        |Arbitrary Waveform 64                   |    0, 1|
+|Name           |Description                   |Channels| Devices|
+|---------------|------------------------------|--------|--------|
+|`sin`          |Sin                           |    0, 1|     all|
+|`square`       |Square                        |    0, 1|     all|
+|`cmos`         |CMOS                          |    0, 1|     all|
+|`adj-pulse`    |Adjustable Pulse              |       0|     all|
+|`dc`           |DC                            |    0, 1|     all|
+|`tri`          |Triangle                      |    0, 1|     all|
+|`ramp`         |Ramp                          |    0, 1|     all|
+|`neg-ramp`     |Negative Ramp                 |    0, 1|     all|
+|`stair-tri`    |Stairstep Triangle            |    0, 1|     all|
+|`stair`        |Stairstep                     |    0, 1|     all|
+|`neg-stair`    |Negative Stairstep            |    0, 1|     all|
+|`exp`          |Exponential                   |    0, 1|     all|
+|`neg-exp`      |Negative Exponential          |    0, 1|     all|
+|`fall-exp`     |Falling Exponential           |    0, 1|     all|
+|`neg-fall-exp` |Negative Falling Exponential  |    0, 1|     all|
+|`log`          |Logarithm                     |    0, 1|     all|
+|`neg-log`      |Negative Logarithm            |    0, 1|     all|
+|`fall-log`     |Falling Logarithm             |    0, 1|     all|
+|`neg-fall-log` |Negative Falling Logarithm    |    0, 1|     all|
+|`full-wav`     |Full Wave                     |    0, 1|     all|
+|`neg-full-wav` |Negative Full Wave            |    0, 1|     all|
+|`half-wav`     |Half Wave                     |    0, 1|     all|
+|`neg-half-wav` |Negative Half Wave            |    0, 1|     all|
+|`lorentz`      |Lorentz Pulse                 |    0, 1|     all|
+|`multitone`    |Multitone                     |    0, 1|     all|
+|`rand`         |Random                        |    0, 1|     all|
+|`ecg`          |ECG                           |    0, 1|     all|
+|`trap`         |Trapezoidal Pulse             |    0, 1|     all|
+|`sinc`         |Sinc Pulse                    |    0, 1|     all|
+|`impulse`      |Impulse                       |    0, 1|     all|
+|`gauss`        |Gauss White Noise             |    0, 1|     all|
+|`am`           |AM                            |    0, 1|     all|
+|`fm`           |FM                            |    0, 1|     all|
+|`chirp`        |Chirp                         |    0, 1|     all|
+|`rectangle`    |Rectangle                     |    0, 1|  fy6900|
+|`tra`          |Trapezoid                     |    0, 1|  fy6900|
+|`arb1`         |Arbitrary Waveform 1          |    0, 1|     all|
+|`arb2`         |Arbitrary Waveform 2          |    0, 1|     all|
+|`arb3`         |Arbitrary Waveform 3          |    0, 1|     all|
+|`arb4`         |Arbitrary Waveform 4          |    0, 1|     all|
+|`arb5`         |Arbitrary Waveform 5          |    0, 1|     all|
+|`arb6`         |Arbitrary Waveform 6          |    0, 1|     all|
+|`arb7`         |Arbitrary Waveform 7          |    0, 1|     all|
+|`arb8`         |Arbitrary Waveform 8          |    0, 1|     all|
+|`arb9`         |Arbitrary Waveform 9          |    0, 1|     all|
+|`arb10`        |Arbitrary Waveform 10         |    0, 1|     all|
+|`arb11`        |Arbitrary Waveform 11         |    0, 1|     all|
+|`arb12`        |Arbitrary Waveform 12         |    0, 1|     all|
+|`arb13`        |Arbitrary Waveform 13         |    0, 1|     all|
+|`arb14`        |Arbitrary Waveform 14         |    0, 1|     all|
+|`arb15`        |Arbitrary Waveform 15         |    0, 1|     all|
+|`arb16`        |Arbitrary Waveform 16         |    0, 1|     all|
+|`arb17`        |Arbitrary Waveform 17         |    0, 1|     all|
+|`arb18`        |Arbitrary Waveform 18         |    0, 1|     all|
+|`arb19`        |Arbitrary Waveform 19         |    0, 1|     all|
+|`arb20`        |Arbitrary Waveform 20         |    0, 1|     all|
+|`arb21`        |Arbitrary Waveform 21         |    0, 1|     all|
+|`arb22`        |Arbitrary Waveform 22         |    0, 1|     all|
+|`arb23`        |Arbitrary Waveform 23         |    0, 1|     all|
+|`arb24`        |Arbitrary Waveform 24         |    0, 1|     all|
+|`arb25`        |Arbitrary Waveform 25         |    0, 1|     all|
+|`arb26`        |Arbitrary Waveform 26         |    0, 1|     all|
+|`arb27`        |Arbitrary Waveform 27         |    0, 1|     all|
+|`arb28`        |Arbitrary Waveform 28         |    0, 1|     all|
+|`arb29`        |Arbitrary Waveform 29         |    0, 1|     all|
+|`arb30`        |Arbitrary Waveform 30         |    0, 1|     all|
+|`arb31`        |Arbitrary Waveform 31         |    0, 1|     all|
+|`arb32`        |Arbitrary Waveform 32         |    0, 1|     all|
+|`arb33`        |Arbitrary Waveform 33         |    0, 1|     all|
+|`arb34`        |Arbitrary Waveform 34         |    0, 1|     all|
+|`arb35`        |Arbitrary Waveform 35         |    0, 1|     all|
+|`arb36`        |Arbitrary Waveform 36         |    0, 1|     all|
+|`arb37`        |Arbitrary Waveform 37         |    0, 1|     all|
+|`arb38`        |Arbitrary Waveform 38         |    0, 1|     all|
+|`arb39`        |Arbitrary Waveform 39         |    0, 1|     all|
+|`arb40`        |Arbitrary Waveform 40         |    0, 1|     all|
+|`arb41`        |Arbitrary Waveform 41         |    0, 1|     all|
+|`arb42`        |Arbitrary Waveform 42         |    0, 1|     all|
+|`arb43`        |Arbitrary Waveform 43         |    0, 1|     all|
+|`arb44`        |Arbitrary Waveform 44         |    0, 1|     all|
+|`arb45`        |Arbitrary Waveform 45         |    0, 1|     all|
+|`arb46`        |Arbitrary Waveform 46         |    0, 1|     all|
+|`arb47`        |Arbitrary Waveform 47         |    0, 1|     all|
+|`arb48`        |Arbitrary Waveform 48         |    0, 1|     all|
+|`arb49`        |Arbitrary Waveform 49         |    0, 1|     all|
+|`arb50`        |Arbitrary Waveform 50         |    0, 1|     all|
+|`arb51`        |Arbitrary Waveform 51         |    0, 1|     all|
+|`arb52`        |Arbitrary Waveform 52         |    0, 1|     all|
+|`arb53`        |Arbitrary Waveform 53         |    0, 1|     all|
+|`arb54`        |Arbitrary Waveform 54         |    0, 1|     all|
+|`arb55`        |Arbitrary Waveform 55         |    0, 1|     all|
+|`arb56`        |Arbitrary Waveform 56         |    0, 1|     all|
+|`arb57`        |Arbitrary Waveform 57         |    0, 1|     all|
+|`arb58`        |Arbitrary Waveform 58         |    0, 1|     all|
+|`arb59`        |Arbitrary Waveform 59         |    0, 1|     all|
+|`arb60`        |Arbitrary Waveform 60         |    0, 1|     all|
+|`arb61`        |Arbitrary Waveform 61         |    0, 1|     all|
+|`arb62`        |Arbitrary Waveform 62         |    0, 1|     all|
+|`arb63`        |Arbitrary Waveform 63         |    0, 1|     all|
+|`arb64`        |Arbitrary Waveform 64         |    0, 1|     all|
 
 # Custom Waveforms
 

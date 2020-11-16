@@ -168,7 +168,7 @@ class ValueCountError(Error):
 
 
 # pylint: disable=redefined-builtin
-def help(section=0, device='', fout=sys.stdout):
+def help(section=0, device='fy2300', fout=sys.stdout):
   """Used to read documentation in an interactive session."""
   try:
     fygen_help.help(section, device, fout)
@@ -178,6 +178,29 @@ def help(section=0, device='', fout=sys.stdout):
 
 def get_version():
   return VERSION
+
+def detect_device(model):
+  """
+  Tries to determine the best-matching device for the given model
+  """
+  model = model.lower()
+
+  # Try matching based on prefix, this is helpful to map e.g.
+  # FY2350H to FY2300
+  for device in wavedef.SUPPORTED_DEVICES:
+    if device[:4] == model[:4]:
+      return device
+
+  raise wavedef.UnsupportedDeviceError(
+      "Unable to autodetect device '%s'. "
+      "Use FYGen(device_name='fy2300') with one of the supported devices, "
+      "beware that the waveforms might not match up."
+      "Supported devices: %s"
+      % (
+          model,
+          ', '.join(wavedef.SUPPORTED_DEVICES)
+      )
+  )
 
 class FYGen(object):
   """Initialize a connection object with the signal generator.
@@ -189,14 +212,16 @@ class FYGen(object):
       self,
       serial_path='/dev/ttyUSB0',
       port=None,
-      device_name='',
+      device_name=None,
       default_channel=0,
       read_before_write=True,
       init_state=True,
       debug_level=0,
       timeout=5,
       max_volts=20.0,
-      min_volts=-20.0):
+      min_volts=-20.0,
+      _port_is_serial=False,
+  ):
     """Initializes connection to device.
 
     Args:
@@ -207,7 +232,8 @@ class FYGen(object):
         that will be sent.
       device_name: Specific device name, such as 'fy2300', 'fy6800'.  Some
         functions may not be available or may be incorrectly mapped if this
-        value is incorrect or left empty.
+        value is incorrect.
+        If left empty the device will be autodetected
       default_channel: The channel(s) used when the parameter is omitted.
       read_before_write: If True, then setting a parameter will first get it.
         If the parameter is already set to the desired value, the value is not
@@ -224,7 +250,12 @@ class FYGen(object):
     """
     if port:
       self.port = port
-      self.is_serial = False
+      self.is_serial = _port_is_serial
+
+      # We cannot autodetect here
+      if not self.is_serial and device_name is None:
+        device_name = 'fy2300'
+
     else:
       self.port = serial.Serial(
           port=serial_path,
@@ -251,6 +282,11 @@ class FYGen(object):
     self.min_volts = min_volts
     # Set to force sweep enable
     self.force_sweep_enable = False
+
+    # Detect model
+    if self.device_name is None:
+      model = self.get_model()
+      self.device_name = detect_device(model)
 
   def close(self):
     """Closes serial port.  Call this at program exit for a clean shutdown."""

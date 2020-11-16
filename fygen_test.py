@@ -5,6 +5,7 @@ import six
 
 import fygen
 import fygen_help
+from wavedef import SUPPORTED_DEVICES
 
 # pylint: disable=too-many-public-methods
 # pylint: disable=invalid-name
@@ -50,7 +51,10 @@ class TestFYGen(unittest.TestCase):
   def setUp(self):
     self.output = six.StringIO()
     self.fy = fygen.FYGen(
-        port=self.output, init_state=False)
+        port=self.output,
+        init_state=False,
+        device_name='fy2300',
+    )
 
   def tearDown(self):
     self.fy.close()
@@ -58,7 +62,7 @@ class TestFYGen(unittest.TestCase):
   def test_help(self):
     """Asserts that all help sections render."""
     for section in range(len(fygen_help.SECTIONS)):
-      fygen.help(section, '', self.output)
+      fygen.help(section, fout=self.output)
       self.assertIn('Other Help Sections', self.output.getvalue())
 
   def test_help_device(self):
@@ -1064,6 +1068,27 @@ class TestFYGen(unittest.TestCase):
 
     self.assertEqual('fy2300', fy.get_model())
     self.assertEqual('UMO\n', fs.getvalue())
+
+  def test_auto_detect_on_init(self):
+    """Autodetects runs on FYGen init"""
+    fs = FakeSerial([b'FY6900-60\n',])
+    fy = fygen.FYGen(port=fs, _port_is_serial=True)
+
+    self.assertEqual('fy6900', fy.device_name)
+    self.assertEqual('UMO\n', fs.getvalue())
+
+  def test_auto_detect(self):
+    self.assertEqual(fygen.detect_device('FY6900-60M'), 'fy6900')
+    self.assertEqual(fygen.detect_device('FY2350H'), 'fy2300')
+
+  def test_autodetect_no_conflict(self):
+    """
+    Make sure no exact match maps to the wrong device.
+    This is just to future proof in case two devices with
+    leading 4-char prefix gets added that have different waveform id's
+    """
+    for device in SUPPORTED_DEVICES:
+      self.assertEqual(fygen.detect_device(device), device)
 
 if __name__ == '__main__':
   unittest.main()
