@@ -36,7 +36,7 @@ PARSER.add_argument(
     '--device',
     help='select signal generator',
     type=str,
-    default='fy2300'
+    default=None,
 )
 
 PARSER.add_argument(
@@ -50,7 +50,7 @@ ARGS = PARSER.parse_args()
 def show_waves(fy, c):
   """Show waves for a given channel."""
   fy.set(channel=1-c, wave='sin')
-  waves = wavedef.get_valid_list(ARGS.device, c)
+  waves = wavedef.get_valid_list(fy.device_name, c)
 
   if not ARGS.include_arbitrary:
     waves = list(w for w in waves if not w.startswith('arb'))
@@ -64,9 +64,9 @@ def show_waves(fy, c):
 def main():
   """Main function."""
   if ARGS.dry_run:
-    fy = fygen.FYGen(port=sys.stdout)
+    fy = fygen.FYGen(port=sys.stdout, device_name=ARGS.device)
   else:
-    fy = fygen.FYGen(debug_level=ARGS.debug_level)
+    fy = fygen.FYGen(debug_level=ARGS.debug_level, device_name=ARGS.device)
   fy.set(0, freq_hz=10000, volts=2, offset_volts=2, enable=True)
   fy.set(1, freq_hz=10000, volts=2, offset_volts=-2, enable=True)
   show_waves(fy, 0)

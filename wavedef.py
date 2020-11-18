@@ -27,9 +27,10 @@ class UnsupportedDeviceError(Error):
 # If your device is not in SUPPORTED_DEVICES you can pick one and it might
 # mostly work anyway.
 SUPPORTED_DEVICES = set((
-    '',
     'fy2300',
+    'fy6600',
     'fy6800',
+    'fy6900',
 ))
 
 # For consistency and better descriptions, all waveform names must be
@@ -55,11 +56,13 @@ _REPLACE_CODES = {
     'pulse': 'Pulse',
     'ramp': 'Ramp',
     'rand': 'Random',
+    'rectangle': 'Rectangle',
     'stair': 'Stairstep',
     'sin': 'Sin',
     'sinc': 'Sinc Pulse',
     'square': 'Square',
     'trap': 'Trapezoidal Pulse',
+    'tra': 'Trapezoid',
     'tri': 'Triangle',
     'wav': 'Wave',
 }
@@ -99,7 +102,10 @@ class WaveformDef(object):
         new_words.append(_REPLACE_CODES[word])
       else:
         raise InvalidNameError(
-            'Waveform name must consist of REPLACE_CODES separated by dashes')
+            'Waveform name ("%s") must consist of REPLACE_CODES '
+            'separated by dashes' %
+            name
+        )
 
     self.description = ' '.join(new_words)
 
@@ -115,7 +121,7 @@ class WaveformDef(object):
         raise InvalidMappingError(
             'mapping does not end with a valid channel: %s' % map_name)
 
-      if device_name not in SUPPORTED_DEVICES:
+      if device_name and device_name not in SUPPORTED_DEVICES:
         raise InvalidMappingError(
             'Device name not in SUPPORTED_DEVICES: %s' % map_name)
 
@@ -131,52 +137,62 @@ class WaveformDef(object):
     self.mappings = mappings
 # pylint: enable=too-few-public-methods
 
-# format
-_WAVEFORM_DEFS = [
-    WaveformDef('sin', {':': 0}),
-    WaveformDef('square', {':': 1}),
-    WaveformDef('cmos', {':': 2}),
-    WaveformDef('adj-pulse', {':0': 3}),
-    WaveformDef('dc', {':0': 4, ':1': 3}),
-    WaveformDef('tri', {':0': 5, ':1': 4}),
-    WaveformDef('ramp', {':0': 6, ':1': 5}),
-    WaveformDef('neg-ramp', {':0': 7, ':1': 6}),
-    WaveformDef('stair-tri', {':0': 8, ':1': 7}),
-    WaveformDef('stair', {':0': 9, ':1': 8}),
-    WaveformDef('neg-stair', {':0': 10, ':1': 9}),
-    WaveformDef('exp', {':0': 11, ':1': 10}),
-    WaveformDef('neg-exp', {':0': 12, ':1': 11}),
-    WaveformDef('fall-exp', {':0': 13, ':1': 12}),
-    WaveformDef('neg-fall-exp', {':0': 14, ':1': 13}),
-    WaveformDef('log', {':0': 15, ':1': 14}),
-    WaveformDef('neg-log', {':0': 16, ':1': 15}),
-    WaveformDef('fall-log', {':0': 17, ':1': 16}),
-    WaveformDef('neg-fall-log', {':0': 18, ':1': 17}),
-    WaveformDef('full-wav', {':0': 19, ':1': 18}),
-    WaveformDef('neg-full-wav', {':0': 20, ':1': 19}),
-    WaveformDef('half-wav', {':0': 21, ':1': 20}),
-    WaveformDef('neg-half-wav', {':0': 22, ':1': 21}),
-    WaveformDef('lorentz', {':0': 23, ':1': 22}),
-    WaveformDef('multitone', {':0': 24, ':1': 23}),
-    WaveformDef('rand', {':0': 25, ':1': 24}),
-    WaveformDef('ecg', {':0': 26, ':1': 25}),
-    WaveformDef('trap', {':0': 27, ':1': 26}),
-    WaveformDef('sinc', {':0': 28, ':1': 27}),
-    WaveformDef('impulse', {':0': 29, ':1': 28}),
-    WaveformDef('gauss', {':0': 30, ':1': 29}),
-    WaveformDef('am', {':0': 31, ':1': 30}),
-    WaveformDef('fm', {':0': 32, ':1': 31}),
-    WaveformDef('chirp', {':0': 33, ':1': 32}),
-]
+_WAVEFORMS = {
+    'sin': {':': 0},
+    'square': {':': 1},
+    'cmos': {':': 2, 'fy6900:': 4},
+    'adj-pulse': {':0': 3, 'fy6900:0': 5},
+    'dc': {':0': 4, ':1': 3, 'fy6900:0': 6, 'fy6900:1': 5},
+    'tri': {':0': 5, ':1': 4, 'fy6900:0': 7, 'fy6900:1': 6},
+    'ramp': {':0': 6, ':1': 5, 'fy6900:0': 8, 'fy6900:1': 7},
+    'neg-ramp': {':0': 7, ':1': 6, 'fy6900:0': 9, 'fy6900:1': 8},
+    'stair-tri': {':0': 8, ':1': 7, 'fy6900:0': 10, 'fy6900:1': 9},
+    'stair': {':0': 9, ':1': 8, 'fy6900:0': 11, 'fy6900:1': 10},
+    'neg-stair': {':0': 10, ':1': 9, 'fy6900:0': 12, 'fy6900:1': 11},
+    'exp': {':0': 11, ':1': 10, 'fy6900:0': 13, 'fy6900:1': 12},
+    'neg-exp': {':0': 12, ':1': 11, 'fy6900:0': 14, 'fy6900:1': 13},
+    'fall-exp': {':0': 13, ':1': 12, 'fy6900:0': 15, 'fy6900:1': 14},
+    'neg-fall-exp': {':0': 14, ':1': 13, 'fy6900:0': 16, 'fy6900:1': 15},
+    'log': {':0': 15, ':1': 14, 'fy6900:0': 17, 'fy6900:1': 16},
+    'neg-log': {':0': 16, ':1': 15, 'fy6900:0': 18, 'fy6900:1': 17},
+    'fall-log': {':0': 17, ':1': 16, 'fy6900:0': 19, 'fy6900:1': 18},
+    'neg-fall-log': {':0': 18, ':1': 17, 'fy6900:0': 20, 'fy6900:1': 19},
+    'full-wav': {':0': 19, ':1': 18, 'fy6900:0': 21, 'fy6900:1': 20},
+    'neg-full-wav': {':0': 20, ':1': 19, 'fy6900:0': 22, 'fy6900:1': 21},
+    'half-wav': {':0': 21, ':1': 20, 'fy6900:0': 23, 'fy6900:1': 22},
+    'neg-half-wav': {':0': 22, ':1': 21, 'fy6900:0': 24, 'fy6900:1': 23},
+    'lorentz': {':0': 23, ':1': 22, 'fy6900:0': 25, 'fy6900:1': 24},
+    'multitone': {':0': 24, ':1': 23, 'fy6900:0': 26, 'fy6900:1': 25},
+    'rand': {':0': 25, ':1': 24, 'fy6900:0': 27, 'fy6900:1': 26},
+    'ecg': {':0': 26, ':1': 25, 'fy6900:0': 28, 'fy6900:1': 27},
+    'trap': {':0': 27, ':1': 26, 'fy6900:0': 29, 'fy6900:1': 28},
+    'sinc': {':0': 28, ':1': 27, 'fy6900:0': 30, 'fy6900:1': 29},
+    'impulse': {':0': 29, ':1': 28, 'fy6900:0': 31, 'fy6900:1': 30},
+    'gauss': {':0': 30, ':1': 29, 'fy6900:0': 32, 'fy6900:1': 31},
+    'am': {':0': 31, ':1': 30, 'fy6900:0': 33, 'fy6900:1': 32},
+    'fm': {':0': 32, ':1': 31, 'fy6900:0': 34, 'fy6900:1': 33},
+    'chirp': {':0': 33, ':1': 32, 'fy6900:0': 35, 'fy6900:1': 34},
+    'rectangle': {'fy6900:': 2},
+    'tra': {'fy6900:': 3},
+}
 
 def _make_arb(count, start_dict):
   for arb_index in range(1, count + 1):
-    _WAVEFORM_DEFS.append(WaveformDef('arb%u' % arb_index, start_dict))
+    _WAVEFORMS['arb%u' % arb_index] = start_dict
     # create a new dictionary will all indexes incremented by one
     start_dict = dict((k, v+1) for k, v in six.iteritems(start_dict))
 
 # Add arb1, arb2 ... arb64
-_make_arb(64, {':0': 34, ':1': 33})
+_make_arb(64, {':0': 34, ':1': 33, 'fy6900:0': 36, 'fy6900:1': 35})
+
+def _make_waveform_defs():
+  return [
+      WaveformDef(name, mapping)
+      for name, mapping in _WAVEFORMS.items()
+  ]
+
+_WAVEFORM_DEFS = _make_waveform_defs()
+
 
 def _generate_waveform_id_dict():
   """Maps _WAVEFORM_DEFS -> _WAVEFORM_IDS.
@@ -247,7 +263,7 @@ def get_id(device_name, name, channel):
     if lookup in _WAVEFORM_IDS:
       return _WAVEFORM_IDS[lookup]
 
-  _check_is_supported(device_name)
+  check_is_supported(device_name)
 
   if channel not in (0, 1):
     raise InvalidChannelError(
@@ -280,7 +296,7 @@ def get_name(device_name, wave_id, channel):
     if lookup in _WAVEFORM_NAMES:
       return _WAVEFORM_NAMES[lookup]
 
-  _check_is_supported(device_name)
+  check_is_supported(device_name)
 
   if channel not in (0, 1):
     raise InvalidChannelError(
@@ -290,7 +306,7 @@ def get_name(device_name, wave_id, channel):
       'Invalid waveform id %d for device %s, channel %d.' %
       (wave_id, device_name, channel))
 
-def _check_is_supported(device_name):
+def check_is_supported(device_name):
   if device_name not in SUPPORTED_DEVICES:
     raise UnsupportedDeviceError(
         'Device %s is not supported.  Supported devices include %s' %
@@ -305,7 +321,7 @@ def get_valid_list(device_name=None, channel=None):
   if device_name is None and channel is None:
     return sorted(_WAVEFORMS_BY_NAME)
 
-  _check_is_supported(device_name)
+  check_is_supported(device_name)
 
   def is_valid(waveform):
     """Returns true if a waveform is valid."""
@@ -331,47 +347,77 @@ def get_description(waveform_name):
   return _WAVEFORMS_BY_NAME[waveform_name].description
 
 # pylint: disable=redefined-builtin
-def help(device_name='', fout=sys.stdout, use_markdown=False):
+def help(device_name=None, fout=sys.stdout, use_markdown=False):
   """Dumps a table of waveform names, along with supported devices and channels.
 
   Example output:
 
-  Name       Description       Channels
+  Name       Description       Channels   Devices
   ----------------------------------------------------
-  sin        Sin               all
-  adj-pulse  Adjustable Pulse  0
+  sin        Sin               all        all
+  adj-pulse  Adjustable Pulse  0          fy2300, fy6800
   ...
   """
-  _check_is_supported(device_name)
+  if device_name is not None:
+    check_is_supported(device_name)
 
-  def dump_row(name, description, channel):
-    fout.write('|%-15s|%-40s|%8s|\n' % (name, description, channel))
+  def dump_row(name, description, channel, device):
+    fout.write('|%-15s|%-30s|%8s|%8s|\n' % (name, description, channel, device))
 
-  def get_channels(waveform):
-    """Returns channels for a given waveform."""
+  def get_compatible(waveform):
+    """
+    Returns compatible devices and channels for a given waveform.
+    At the moment the output would be a bit confusing if two devices
+    support the same waveform but only on different channels.
+    Luckily there aren't any waveforms like that yet
+    """
     channel_set = set()
+    device_set = set()
     for mapping in waveform.mappings:
-      if mapping.startswith(':') or mapping.startswith('%s:' % device_name):
-        channel = mapping.split(':')[1]
+      is_included = (
+          mapping.startswith(':') or
+          mapping.startswith('%s:' % device_name) or
+          device_name is None
+      )
+      if is_included:
+        device, channel = mapping.split(':')
+        if not device:
+          device_set = SUPPORTED_DEVICES
+        else:
+          device_set.add(device)
+
         if not channel:
-          return '0, 1'
-        channel_set.add(channel)
+          channel_set.add('0')
+          channel_set.add('1')
+        else:
+          channel_set.add(channel)
 
     if not channel_set:
-      return None
+      return None, None
 
-    return ', '.join(sorted(channel_set))
+    if device_set == SUPPORTED_DEVICES:
+      device_text = 'all'
+    else:
+      device_text = ','.join(sorted(device_set))
+
+    channel_text = ', '.join(sorted(channel_set))
+    return (device_text, channel_text)
 
   def describe_waveform(waveform):
     """Dumps a waveform description line."""
-    channels = get_channels(waveform)
+    devices, channels = get_compatible(waveform)
     name = '`%s`' % waveform.name if use_markdown else waveform.name
     if channels:
-      dump_row(name, waveform.description, channels)
+      dump_row(name, waveform.description, channels, devices)
 
-  dump_row('Name', 'Description', 'Channels')
+  dump_row('Name', 'Description', 'Channels', 'Devices')
   fout.write(
-      '|---------------|----------------------------------------|--------|\n')
-  for waveform in _WAVEFORM_DEFS:
+      '|---------------|------------------------------|--------|--------|\n')
+
+  waveforms_arbs_last = sorted(
+      _WAVEFORM_DEFS,
+      key=lambda x: x.name.startswith('arb'),
+  )
+  for waveform in waveforms_arbs_last:
     describe_waveform(waveform)
 # pylint: enable=redefined-builtin

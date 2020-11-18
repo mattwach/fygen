@@ -33,8 +33,9 @@ _HELP['Introduction'] = """
 generators.  It was developed with the
 [FY2300](http://en.feeltech.net/index.php?case=archive&act=show&aid=17) which is
 nearly identical to the
-[FY6600](http://en.feeltech.net/index.php?case=archive&act=show&aid=59) and
-[FY6800](http://en.feeltech.net/index.php?case=archive&act=show&aid=61) in
+[FY6600](http://en.feeltech.net/index.php?case=archive&act=show&aid=59),
+[FY6800](http://en.feeltech.net/index.php?case=archive&act=show&aid=61) and
+[FY6900](http://en.feeltech.net/index.php?case=archive&act=show&aid=65) in
 features.  Other generators should also work, although some tweaks may be
 required.
 
@@ -97,6 +98,12 @@ value.
     import fygen
     fy = fygen.FYGen('/dev/ttyUSB0', debug_level=1)
     fy = fygen.FYGen(debug_level=1)  # Same thing
+    
+    # In case you get UnsupportedDeviceError, you can manually specify
+    # one of the supported devices that may be compatible.
+    # The id's of waveforms are different between models,
+    # so you might not get the waveform you ask for
+    fy = fygen.FyGen(device_name='fy2300')
     
 Once connected, this command will setup a 1Mhz sin wave on the main channel:
 
@@ -620,7 +627,7 @@ class UnknownDeviceError(Error):
 # pylint: disable=redefined-builtin
 def help(
     section,
-    device,
+    device=None,
     fout=sys.stdout,
     show_other_sections=True,
     markdown_format=False):
