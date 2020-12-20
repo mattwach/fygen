@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python2
 """Minimalist sweep example that changes the duty cycle between 0.1 and 0.9."""
 
 import sys

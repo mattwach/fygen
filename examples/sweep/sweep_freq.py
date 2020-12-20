@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python2
 """Minimalist sweep example that sweeps between 1khz and 10khz."""
 
 import sys

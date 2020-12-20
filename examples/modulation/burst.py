@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python2
 """Minimalist burst example.
 
 This one sets up a 10Khz sin wave that is triggered by a 1Khz square wave.

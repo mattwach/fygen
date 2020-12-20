@@ -538,7 +538,7 @@ class FYGen(object):
     # mapping of parameters to conversion functions.
     conversions = {
         'duty_cycle': lambda: float(send('D')) / 100000.0,
-        'enable': lambda: True if int(send('N')) else False,
+        'enable': lambda: bool(int(send('N'))),
         'freq_hz': lambda: int(send('F').split('.')[0]),
         'freq_uhz': lambda: int(float(send('F')) * 1000000.0),
         'offset_volts': get_offset_volts,
@@ -1092,7 +1092,7 @@ class FYGen(object):
       if p not in SYNC_MODES:
         raise InvalidSynchronizationMode(
             'Invalid synchronization mode: %s' % p)
-      data[p] = True if int(self.send('RSA%u' % SYNC_MODES[p])) else False
+      data[p] = bool(int(self.send('RSA%u' % SYNC_MODES[p])))
 
     if isinstance(params, str):
       return data[params]
@@ -1105,7 +1105,7 @@ class FYGen(object):
 
   def get_buzzer(self):
     """Returns True if the buzzer is enabled."""
-    return True if int(self.send('RBZ')) else False
+    return bool(int(self.send('RBZ')))
 
   def set_uplink(self, is_master=None, enable=None):
     """Sets uplink mode as master or slave.
@@ -1144,9 +1144,9 @@ class FYGen(object):
     results = {}
     for parm in params:
       if parm == 'enable':
-        results[parm] = True if int(self.send('RUL')) else False
+        results[parm] = bool(int(self.send('RUL')))
       elif parm == 'is_master':
-        results[parm] = False if int(self.send('RMS')) else True
+        results[parm] = not bool(int(self.send('RMS')))
       else:
         raise UnknownParameterError('Unknown uplink parameter: %s' % parm)
 

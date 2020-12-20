@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python2
 """Minimalist example that shows a sin wave being configured."""
 
 import sys

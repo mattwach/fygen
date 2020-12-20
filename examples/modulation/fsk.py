@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python2
 """Minimalist FSK modulation example.
 
 Setup a triangular wave that alternates between 1Khz and 2Khz each second

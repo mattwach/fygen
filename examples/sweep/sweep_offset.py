@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python2
 """Minimalist sweep example that changes the offset between -1 and 1 volts."""
 
 import sys

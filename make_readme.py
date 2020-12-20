@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python2
 """Script to turn help files into a README.md"""
 
 import fygen_help

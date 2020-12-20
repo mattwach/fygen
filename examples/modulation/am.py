@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python2
 """Minimalist AM modulation example.
 
 Setup a 2kz sin wave that is modulated by a 150hz triangle wave

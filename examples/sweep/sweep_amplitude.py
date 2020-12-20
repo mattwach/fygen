@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python2
 """Minimalist sweep example that sweeps between 3.3 and 5V."""
 
 import sys

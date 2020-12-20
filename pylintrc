@@ -127,6 +127,9 @@ disable=print-statement,
         dict-items-not-iterating,
         dict-keys-not-iterating,
         dict-values-not-iterating,
+        raise-missing-from,
+        useless-object-inheritance,
+        consider-using-get,
 		duplicate-code,
 		no-member
 

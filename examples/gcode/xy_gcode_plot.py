@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 """Can read a simple form of GCode and create an XY plot.
 
 See the gcode/ subdir for example files.
@@ -11,6 +11,7 @@ Example usage:
 import argparse
 import math
 import sys
+import six
 
 sys.path.append('../..')
 
@@ -184,7 +185,7 @@ def interpolate(data):
   print('length=%s  segment_size=%s' % (length, segment_size))
 
   datai = (p for p in data)
-  x1, y1, pen_down = datai.next()
+  x1, y1, pen_down = six.next(datai)
   new_data = [(x1, y1, pen_down)]
 
   for p in datai:
@@ -226,7 +227,7 @@ def calc_length(data):
   length = 0.0
 
   datai = (p for p in data)
-  x1, y1, _ = datai.next()
+  x1, y1, _ = six.next(datai)
 
   for p in datai:
     x2, y2, pen_down = p
@@ -331,7 +332,7 @@ def main():
   #
   # We go for the last option, removing 1/10 of the needed points each iteration
   while len(data) > ARGS.data_length:
-    points_to_remove = (len(data) - ARGS.data_length) / 10
+    points_to_remove = int((len(data) - ARGS.data_length) / 10)
     if points_to_remove < 1:
       points_to_remove = 1
     reduce(data, points_to_remove)

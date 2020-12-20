@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python2
 """Minimalist example that should a custom waveform being programmed.
 
 The waveform generated here is a simple stairstep.

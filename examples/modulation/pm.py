@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python2
 """Minimalist PM modulation example.
 
 Setup a 1kz sin wave that is modulated by a 500hz square wave

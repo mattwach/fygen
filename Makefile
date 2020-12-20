@@ -4,11 +4,11 @@ help:
 all: test gcode_dryrun dryrun lint
 
 test:
-	python fygen_test.py
+	python2 fygen_test.py
 	python3 fygen_test.py
 
 lint:
-	pylint3 \
+	PYTHONPATH=$(shell pwd) pylint \
    *.py \
    examples/basic/*.py \
    examples/modulation/*.py \

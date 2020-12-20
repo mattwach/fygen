@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python2
 """Minimalist PSK modulation example.
 
 Setup a 1kz CMOS wave that changes inverts at 100hz

@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python2
 """Interpolates points to draw a star on an oscilloscope (when set to XY mode"""
 
 import math
