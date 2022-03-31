@@ -28,6 +28,7 @@ class UnsupportedDeviceError(Error):
 # mostly work anyway.
 SUPPORTED_DEVICES = set((
     'fy2300',
+    'fy6300',
     'fy6600',
     'fy6800',
     'fy6900',
