@@ -1090,5 +1090,38 @@ class TestFYGen(unittest.TestCase):
     for device in SUPPORTED_DEVICES:
       self.assertEqual(fygen.detect_device(device), device)
 
+class TestFYGenFY6300(TestFYGen):
+  """Test harness for FY6300, which represents frequency differently in WMF/WFF command."""
+  def setUp(self):
+    self.output = six.StringIO()
+    self.fy = fygen.FYGen(
+      port=self.output,
+      init_state=False,
+      device_name='fy6300',
+    )
+
+  def tearDown(self):
+    self.fy.close()
+
+  def test_set_freq1(self):
+    """Sets a frequency using freq_hz."""
+    self.fy.set(freq_hz=5000)
+    self.fy.set(channel=1, freq_hz=1e6)
+    self.assertEqual(
+      'WMF00005000.000000\n'
+      'WFF01000000.000000\n',
+      self.output.getvalue())
+
+  def test_set_freq2(self):
+    """Sets a frequency using freq_uhz."""
+    self.fy.set(freq_uhz=5000)
+    self.fy.set(channel=1, freq_uhz=1e6)
+    self.assertEqual(
+      'WMF00000000.005000\n'
+      'WFF00000001.000000\n',
+      self.output.getvalue())
+
+
 if __name__ == '__main__':
   unittest.main()
+

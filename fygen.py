@@ -288,6 +288,15 @@ class FYGen(object):
       model = self.get_model()
       self.device_name = detect_device(model)
 
+    self.frequency_includes_decimal = False
+    if self.device_name == "fy6300":
+      # Model:   FY6300-50M
+      # Version: V2.3.2
+      # Frequency must be sent with decimal for WMF/WFF commands,
+      # And RMF command is received with decimal.
+      # (e.g. frequency is always represented in the form): 12345678.901234 Hz
+      self.frequency_includes_decimal = True
+
   def close(self):
     """Closes serial port.  Call this at program exit for a clean shutdown."""
     self.port.close()
@@ -444,8 +453,8 @@ class FYGen(object):
     make_command = {
         'duty_cycle': functools.partial(_make_duty_cycle_command, channel),
         'enable': functools.partial(_make_enable_command, channel),
-        'freq_hz': functools.partial(_make_freq_hz_command, channel),
-        'freq_uhz': functools.partial(_make_freq_uhz_command, channel),
+        'freq_hz': functools.partial(_make_freq_hz_command, channel, include_decimal=self.frequency_includes_decimal),
+        'freq_uhz': functools.partial(_make_freq_uhz_command, channel, include_decimal=self.frequency_includes_decimal),
         'offset_volts': functools.partial(
             _make_offset_volts_command,
             channel,
@@ -1218,7 +1227,7 @@ def _make_wave_command(channel, device_name, wave):
   return _make_command(channel, 'W%02u' % wave)
 
 
-def _make_freq_uhz_command(channel, freq_uhz):
+def _make_freq_uhz_command(channel, freq_uhz, include_decimal=False):
   """Create a frequency command string.
 
   freq_hz and freq_uhz are summed for the final result.
@@ -1233,10 +1242,15 @@ def _make_freq_uhz_command(channel, freq_uhz):
   if freq_uhz < 0:
     raise InvalidFrequencyError('Invalid freq_uhz: %d' % freq_uhz)
 
-  return _make_command(channel, 'F%014u' % freq_uhz)
+  if include_decimal:
+    s = 'F%015.6f' % (freq_uhz/1e6)
+    return _make_command(channel, s)
+  else:
+    return _make_command(channel, 'F%014u' % freq_uhz)
 
-def _make_freq_hz_command(channel, freq_hz):
-  return _make_freq_uhz_command(channel, freq_hz * 1000000)
+
+def _make_freq_hz_command(channel, freq_hz, include_decimal=False):
+  return _make_freq_uhz_command(channel, freq_hz * 1000000, include_decimal=include_decimal)
 
 
 def _make_volts_command(channel, max_volts, volts):
