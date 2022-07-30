@@ -98,6 +98,10 @@ value.
     import fygen
     fy = fygen.FYGen('/dev/ttyUSB0', debug_level=1)
     fy = fygen.FYGen(debug_level=1)  # Same thing
+
+    # Some devices (e.g. FY2320) need the baudrate set to 9600.  See the
+    # troubleshooting section for more details.
+    fy = fygen.FYGen(baudrate=9600)
     
     # In case you get UnsupportedDeviceError, you can manually specify
     # one of the supported devices that may be compatible.
@@ -559,7 +563,11 @@ Start with the basics
     fy.send('WMW01')
 
 See if the UI on the generator responds.  If so, you have basic operations
-working.
+working.  If these basic commands do not respond, try initializing with a
+different baud rate (At least some and possibly all FY2320s need this change):
+
+    fy = fygen.FYGen(baudrate=9600)
+    fy.send('WMW01')
 
 The next thing to try is to turn on debug mode.
 

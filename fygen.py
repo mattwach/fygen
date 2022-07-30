@@ -211,6 +211,7 @@ class FYGen(object):
   def __init__(
       self,
       serial_path='/dev/ttyUSB0',
+      baudrate=115200,
       port=None,
       device_name=None,
       default_channel=0,
@@ -227,6 +228,8 @@ class FYGen(object):
     Args:
       serial_path: Path to usb serial device.  The format of this will vary by
         OS and will vary if you have multiple USB serial devices connected.
+      baudrate: Serial baud rate to use within the generator.  Users with
+        a FY2320 have reported needing to set this to 9600.
       port: If not None, specifies an output port.  In this case, path is
         ignored.  One usecase is to set port=sys.stdout to see the commands
         that will be sent.
@@ -259,7 +262,7 @@ class FYGen(object):
     else:
       self.port = serial.Serial(
           port=serial_path,
-          baudrate=115200,
+          baudrate=baudrate,
           bytesize=serial.EIGHTBITS,
           parity=serial.PARITY_NONE,
           stopbits=serial.STOPBITS_ONE,
