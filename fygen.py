@@ -23,6 +23,7 @@ VERSION = 1.0
 # Explicit channel numbers if you want the code a bit clearer.
 CH1 = 0
 CH2 = 1
+CH3 = 2
 
 # Modulation Modes
 MODULATION_FSK = 0
@@ -73,7 +74,7 @@ MAX_READ_SIZE = 256
 
 # Initialization state
 SET_INIT_STATE = {
-    'channel': (0, 1),
+    'channel': (0, 1, 2),
     'duty_cycle': 0.5,
     'enable': False,
     'freq_hz': 10000,
@@ -307,7 +308,7 @@ class FYGen(object):
       self.device_name = detect_device(model)
 
     self.frequency_includes_decimal = False
-    if self.device_name in ("fy6300", "fy6900"):
+    if self.device_name in ("fy6300", "fy6900", "fy8300"):
       # Model:   FY6300-50M
       # Version: V2.3.2
       # Frequency must be sent with decimal for WMF/WFF commands,
@@ -423,7 +424,7 @@ class FYGen(object):
         as set from the dictionary.  This is done to avoid redundant reads
         on retries.
     """
-    if channel not in (0, 1):
+    if channel not in (0, 1, 2):
       raise InvalidChannelError('Invalid channel: %s' % channel)
 
     # Implements init_state functionality.
@@ -525,7 +526,7 @@ class FYGen(object):
     if isinstance(channel, (list, tuple)):
       channel = channel[0]
 
-    if channel not in (0, 1):
+    if channel not in (0, 1, 2):
       raise InvalidChannelError('Invalid channel: %s' % channel)
 
     if params is None:
@@ -540,7 +541,7 @@ class FYGen(object):
       raise InvalidFrequencyError(
           'Please, provide freq_hz or freq_uhz, not both.')
 
-    prefix = 'RF' if channel == 1 else 'RM'
+    prefix = {1: "RF", 2: "RT"}.get(channel, "RM")
 
     def send(code):
       """self.send shortcut."""
@@ -1204,7 +1205,7 @@ def _make_command(channel, suffix):
   """Creates a generic command.
 
   Args:
-    channel: 0 or 1
+    channel: 0, 1 or 2
     suffix: The suffix of the command.  e.g. W00 would be for sin waveform.
 
   Raises:
@@ -1216,8 +1217,11 @@ def _make_command(channel, suffix):
   if channel == 1:
     return 'WF' + suffix
 
+  if channel == 2:
+    return 'TF' + suffix
+
   raise InvalidChannelError(
-      'Invalid channel: %s.  Only 0 or 1 is supported' % channel)
+      'Invalid channel: %s.  Only 0, 1 or 2 is supported' % channel)
 
 def _make_wave_command(channel, device_name, wave):
   """Creates a wave command string.

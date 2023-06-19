@@ -32,6 +32,7 @@ SUPPORTED_DEVICES = set((
     'fy6600',
     'fy6800',
     'fy6900',
+    'fy8300',
 ))
 
 # For consistency and better descriptions, all waveform names must be
@@ -118,7 +119,7 @@ class WaveformDef(object):
 
       device_name, channel = map_name.split(':')
 
-      if channel not in ('', '0', '1'):
+      if channel not in ('', '0', '1', '2'):
         raise InvalidMappingError(
             'mapping does not end with a valid channel: %s' % map_name)
 
@@ -184,7 +185,7 @@ def _make_arb(count, start_dict):
     start_dict = dict((k, v+1) for k, v in six.iteritems(start_dict))
 
 # Add arb1, arb2 ... arb64
-_make_arb(64, {':0': 34, ':1': 33, 'fy6900:0': 36, 'fy6900:1': 35})
+_make_arb(64, {':0': 34, ':1': 33, 'fy6900:0': 36, 'fy6900:1': 35, "fy8300:0": 36, "fy8300:1": 35, "fy8300:2": 35})
 
 def _make_waveform_defs():
   return [
