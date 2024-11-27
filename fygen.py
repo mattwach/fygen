@@ -289,7 +289,7 @@ class FYGen(object):
       self.device_name = detect_device(model)
 
     self.frequency_includes_decimal = False
-    if self.device_name == "fy6300":
+    if self.device_name in ("fy6300", "fy6900"):
       # Model:   FY6300-50M
       # Version: V2.3.2
       # Frequency must be sent with decimal for WMF/WFF commands,
