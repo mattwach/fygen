@@ -17,8 +17,9 @@ PARSER = argparse.ArgumentParser(
     description='Cycle through all available waves for a given device')
 
 PARSER.add_argument(
-    '--port',
-    help='Select connection port',
+    '--serial_path',
+    help='Select the connection port\n'
+         '(Something like \'/dev/ttyUSB0\' on Linux, or \'COM3\' on Windows.)',
     type=str,
 )
 
@@ -68,18 +69,11 @@ def show_waves(fy, c):
 
 def main():
   """Main function."""
-  # Sanitize arguments and inject arguments defined in the environment.
-  if ARGS.port is None:
-    ARGS.port = os.environ.get("FYPORT")
-  if ARGS.device is None:
-    ARGS.device = os.environ.get("FYDEVICE")
-  if ARGS.device is not None:
-    ARGS.device = ARGS.device.lower()
   # Open FYGen.
   if ARGS.dry_run:
     fy = fygen.FYGen(port=sys.stdout, device_name=ARGS.device)
   else:
-    fy = fygen.FYGen(serial_path=ARGS.port,
+    fy = fygen.FYGen(serial_path=ARGS.serial_path,
       debug_level=ARGS.debug_level, device_name=ARGS.device)
   # Run.
   fy.set(0, freq_hz=10000, volts=2, offset_volts=2, enable=True)

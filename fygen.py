@@ -5,6 +5,7 @@ See help.py or use the command fygen.help() for more documentation.
 # pylint: disable=too-many-lines
 # pylint: disable=too-many-public-methods
 
+import os
 import sys
 import time
 import functools
@@ -210,7 +211,7 @@ class FYGen(object):
   """
   def __init__(
       self,
-      serial_path='/dev/ttyUSB0',
+      serial_path=None,
       port=None,
       device_name=None,
       default_channel=0,
@@ -227,13 +228,15 @@ class FYGen(object):
     Args:
       serial_path: Path to usb serial device.  The format of this will vary by
         OS and will vary if you have multiple USB serial devices connected.
+        It can also be defined by the FYSERIAL environmental variable.
       port: If not None, specifies an output port.  In this case, path is
         ignored.  One usecase is to set port=sys.stdout to see the commands
         that will be sent.
       device_name: Specific device name, such as 'fy2300', 'fy6800'.  Some
         functions may not be available or may be incorrectly mapped if this
         value is incorrect.
-        If left empty the device will be autodetected
+        It can also be defined by the FYDEVICE environmental variable.
+        If left empty the device will be autodetected.
       default_channel: The channel(s) used when the parameter is omitted.
       read_before_write: If True, then setting a parameter will first get it.
         If the parameter is already set to the desired value, the value is not
@@ -257,18 +260,33 @@ class FYGen(object):
         device_name = 'fy2300'
 
     else:
+      # Sanitize arguments and inject arguments defined in the environment.
+      if serial_path is None:
+        serial_path = os.environ.get("FYSERIAL")
+      if serial_path is None:
+        serial_path = '/dev/ttyUSB0'
+      if device_name is None:
+        device_name = os.environ.get("FYDEVICE")
+      if device_name is not None:
+        device_name = device_name.lower()
+      # Open serial port.
       self.port = serial.Serial(
           port=serial_path,
           baudrate=115200,
           bytesize=serial.EIGHTBITS,
           parity=serial.PARITY_NONE,
-          stopbits=serial.STOPBITS_ONE,
+          stopbits=serial.STOPBITS_TWO, # Important for FY6900!
           rtscts=False,
           dsrdtr=False,
           xonxoff=False,
           timeout=timeout)
-
+      # Flush buffers.
       self.is_serial = True
+      self.port.reset_output_buffer()
+      self.port.reset_input_buffer()
+      self.port.write('\n\n\n'.encode())
+      self.port.flush()
+      time.sleep(0.01)
       self.port.reset_output_buffer()
       self.port.reset_input_buffer()
 
