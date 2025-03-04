@@ -1,4 +1,4 @@
-#!/usr/bin/python2
+#!/usr/bin/env python
 
 """Cycles though all avaliable waves."""
 
@@ -15,6 +15,13 @@ import wavedef
 
 PARSER = argparse.ArgumentParser(
     description='Cycle through all available waves for a given device')
+
+PARSER.add_argument(
+    '--serial_path',
+    help='Select the connection port\n'
+         '(Something like \'/dev/ttyUSB0\' on Linux, or \'COM3\' on Windows.)',
+    type=str,
+)
 
 PARSER.add_argument(
     '--dry_run',
@@ -34,9 +41,8 @@ PARSER.add_argument(
 
 PARSER.add_argument(
     '--device',
-    help='select signal generator',
+    help='Select signal generator type',
     type=str,
-    default=None,
 )
 
 PARSER.add_argument(
@@ -63,10 +69,13 @@ def show_waves(fy, c):
 
 def main():
   """Main function."""
+  # Open FYGen.
   if ARGS.dry_run:
     fy = fygen.FYGen(port=sys.stdout, device_name=ARGS.device)
   else:
-    fy = fygen.FYGen(debug_level=ARGS.debug_level, device_name=ARGS.device)
+    fy = fygen.FYGen(serial_path=ARGS.serial_path,
+      debug_level=ARGS.debug_level, device_name=ARGS.device)
+  # Run.
   fy.set(0, freq_hz=10000, volts=2, offset_volts=2, enable=True)
   fy.set(1, freq_hz=10000, volts=2, offset_volts=-2, enable=True)
   show_waves(fy, 0)
