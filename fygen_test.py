@@ -1122,6 +1122,34 @@ class TestFYGenFY6300(TestFYGen):
       self.output.getvalue())
 
 
+class TestFYGenFY8300(unittest.TestCase):
+  """Tests behaviour unique to the three-channel FY8300 generators."""
+  def setUp(self):
+    self.output = six.StringIO()
+    self.fy = fygen.FYGen(
+        port=self.output,
+        init_state=False,
+        device_name='fy8300',
+    )
+
+  def tearDown(self):
+    self.fy.close()
+
+  def test_set_channel_two_wave(self):
+    """Ensures channel 2 accepts standard waveform commands."""
+    self.fy.set(channel=2, wave='square')
+    self.assertEqual('TFW01\n', self.output.getvalue())
+
+  def test_get_channel_two_wave(self):
+    """Ensures channel 2 can be queried for waveform selection."""
+    fs = FakeSerial([b'0\n'])
+    fy = fygen.FYGen(port=fs, init_state=False, device_name='fy8300')
+    fy.is_serial = True
+
+    self.assertEqual('sin', fy.get(2, 'wave'))
+    self.assertEqual('RTW\n', fs.getvalue())
+
+
 if __name__ == '__main__':
   unittest.main()
 

@@ -35,6 +35,12 @@ SUPPORTED_DEVICES = set((
     'fy8300',
 ))
 
+DEFAULT_CHANNELS = (0, 1)
+
+CHANNELS_BY_DEVICE = {
+  'fy8300': (0, 1, 2),
+}
+
 # For consistency and better descriptions, all waveform names must be
 # constructed from a combination of the following tokens, separated by dashes.
 _REPLACE_CODES = {
@@ -265,11 +271,11 @@ def get_id(device_name, name, channel):
     if lookup in _WAVEFORM_IDS:
       return _WAVEFORM_IDS[lookup]
 
-  check_is_supported(device_name)
+  valid_channels = get_supported_channels(device_name)
 
-  if channel not in (0, 1):
+  if channel not in valid_channels:
     raise InvalidChannelError(
-        'Invalid channel %d.  Please use a 0 or 1' % channel)
+        'Invalid channel %d.  Please use one of %s' % (channel, valid_channels))
 
   raise InvalidWaveformError(
       'Invalid waveform %s for device %s, channel %d.  Available waveforms '
@@ -298,11 +304,11 @@ def get_name(device_name, wave_id, channel):
     if lookup in _WAVEFORM_NAMES:
       return _WAVEFORM_NAMES[lookup]
 
-  check_is_supported(device_name)
+  valid_channels = get_supported_channels(device_name)
 
-  if channel not in (0, 1):
+  if channel not in valid_channels:
     raise InvalidChannelError(
-        'Invalid channel %d.  Please use a 0 or 1' % channel)
+        'Invalid channel %d.  Please use one of %s' % (channel, valid_channels))
 
   raise InvalidWaveformIdError(
       'Invalid waveform id %d for device %s, channel %d.' %
@@ -313,6 +319,11 @@ def check_is_supported(device_name):
     raise UnsupportedDeviceError(
         'Device %s is not supported.  Supported devices include %s' %
         (device_name, SUPPORTED_DEVICES))
+
+def get_supported_channels(device_name):
+  """Returns the tuple of supported channels for the given device."""
+  check_is_supported(device_name)
+  return CHANNELS_BY_DEVICE.get(device_name, DEFAULT_CHANNELS)
 
 def get_valid_list(device_name=None, channel=None):
   """Returns a list of all valid waves for a given device_name and channel.

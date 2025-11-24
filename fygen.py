@@ -316,10 +316,25 @@ class FYGen(object):
       # (e.g. frequency is always represented in the form): 12345678.901234 Hz
       self.frequency_includes_decimal = True
 
+    self.supported_channels = self._determine_supported_channels()
+
   def close(self):
     """Closes serial port.  Call this at program exit for a clean shutdown."""
     self.port.close()
     self.port = None
+
+  def _determine_supported_channels(self):
+    """Returns the tuple of supported channel indices for the device."""
+    if self.device_name is None:
+      return (CH1, CH2)
+    try:
+      return tuple(wavedef.get_supported_channels(self.device_name))
+    except wavedef.UnsupportedDeviceError:
+      return (CH1, CH2)
+
+  def _validate_channel(self, channel):
+    if channel not in self.supported_channels:
+      raise InvalidChannelError('Invalid channel: %s' % channel)
 
   def send(self, command, retry_count=5):
     """Sends command, then waits for a response.  Returns the response."""
@@ -424,8 +439,7 @@ class FYGen(object):
         as set from the dictionary.  This is done to avoid redundant reads
         on retries.
     """
-    if channel not in (0, 1, 2):
-      raise InvalidChannelError('Invalid channel: %s' % channel)
+    self._validate_channel(channel)
 
     # Implements init_state functionality.
     if self.init_state and channel not in self.init_called_for_channel:
@@ -526,8 +540,7 @@ class FYGen(object):
     if isinstance(channel, (list, tuple)):
       channel = channel[0]
 
-    if channel not in (0, 1, 2):
-      raise InvalidChannelError('Invalid channel: %s' % channel)
+    self._validate_channel(channel)
 
     if params is None:
       p = sorted(SET_INIT_STATE)
@@ -643,7 +656,7 @@ class FYGen(object):
           'Unexpected value array length.  expected %d, got %d' %
           (value_count, len(raw_values)))
 
-    for c in (0, 1):
+    for c in self.supported_channels:
       if self.is_serial and self.get(c, 'wave') == 'arb%u' % waveform_index:
         raise ChannelActiveError(
             'Can not update arb%u because it is active on channel %u' %
