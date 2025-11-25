@@ -23,6 +23,7 @@ VERSION = 1.0
 # Explicit channel numbers if you want the code a bit clearer.
 CH1 = 0
 CH2 = 1
+CH3 = 2
 
 # Modulation Modes
 MODULATION_FSK = 0
@@ -73,7 +74,7 @@ MAX_READ_SIZE = 256
 
 # Initialization state
 SET_INIT_STATE = {
-    'channel': (0, 1),
+    'channel': (0, 1, 2),
     'duty_cycle': 0.5,
     'enable': False,
     'freq_hz': 10000,
@@ -307,7 +308,7 @@ class FYGen(object):
       self.device_name = detect_device(model)
 
     self.frequency_includes_decimal = False
-    if self.device_name in ("fy6300", "fy6900"):
+    if self.device_name in ("fy6300", "fy6900", "fy8300"):
       # Model:   FY6300-50M
       # Version: V2.3.2
       # Frequency must be sent with decimal for WMF/WFF commands,
@@ -315,10 +316,25 @@ class FYGen(object):
       # (e.g. frequency is always represented in the form): 12345678.901234 Hz
       self.frequency_includes_decimal = True
 
+    self.supported_channels = self._determine_supported_channels()
+
   def close(self):
     """Closes serial port.  Call this at program exit for a clean shutdown."""
     self.port.close()
     self.port = None
+
+  def _determine_supported_channels(self):
+    """Returns the tuple of supported channel indices for the device."""
+    if self.device_name is None:
+      return (CH1, CH2)
+    try:
+      return tuple(wavedef.get_supported_channels(self.device_name))
+    except wavedef.UnsupportedDeviceError:
+      return (CH1, CH2)
+
+  def _validate_channel(self, channel):
+    if channel not in self.supported_channels:
+      raise InvalidChannelError('Invalid channel: %s' % channel)
 
   def send(self, command, retry_count=5):
     """Sends command, then waits for a response.  Returns the response."""
@@ -423,8 +439,7 @@ class FYGen(object):
         as set from the dictionary.  This is done to avoid redundant reads
         on retries.
     """
-    if channel not in (0, 1):
-      raise InvalidChannelError('Invalid channel: %s' % channel)
+    self._validate_channel(channel)
 
     # Implements init_state functionality.
     if self.init_state and channel not in self.init_called_for_channel:
@@ -525,8 +540,7 @@ class FYGen(object):
     if isinstance(channel, (list, tuple)):
       channel = channel[0]
 
-    if channel not in (0, 1):
-      raise InvalidChannelError('Invalid channel: %s' % channel)
+    self._validate_channel(channel)
 
     if params is None:
       p = sorted(SET_INIT_STATE)
@@ -540,7 +554,7 @@ class FYGen(object):
       raise InvalidFrequencyError(
           'Please, provide freq_hz or freq_uhz, not both.')
 
-    prefix = 'RF' if channel == 1 else 'RM'
+    prefix = {1: "RF", 2: "RT"}.get(channel, "RM")
 
     def send(code):
       """self.send shortcut."""
@@ -642,7 +656,7 @@ class FYGen(object):
           'Unexpected value array length.  expected %d, got %d' %
           (value_count, len(raw_values)))
 
-    for c in (0, 1):
+    for c in self.supported_channels:
       if self.is_serial and self.get(c, 'wave') == 'arb%u' % waveform_index:
         raise ChannelActiveError(
             'Can not update arb%u because it is active on channel %u' %
@@ -1204,7 +1218,7 @@ def _make_command(channel, suffix):
   """Creates a generic command.
 
   Args:
-    channel: 0 or 1
+    channel: 0, 1 or 2
     suffix: The suffix of the command.  e.g. W00 would be for sin waveform.
 
   Raises:
@@ -1216,8 +1230,11 @@ def _make_command(channel, suffix):
   if channel == 1:
     return 'WF' + suffix
 
+  if channel == 2:
+    return 'TF' + suffix
+
   raise InvalidChannelError(
-      'Invalid channel: %s.  Only 0 or 1 is supported' % channel)
+      'Invalid channel: %s.  Only 0, 1 or 2 is supported' % channel)
 
 def _make_wave_command(channel, device_name, wave):
   """Creates a wave command string.
